@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Mean ACE Score by High School Zone (with Distance from Nearest ILP-informed Officer)</title>
+        <style>
+            .custom-title {
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="custom-title">Mean ACE Score by High School Zone (with Distance from Nearest ILP-informed Officer)</div>
+        <div id="map">
+        </div>
+        <div id="tooltip" style="position: absolute; display: none; background-color: rgba(255, 255, 255, 0.8); padding: 5px; z-index: 999;"></div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/HighBoundariesExport_0.js"></script>
+        <script src="data/HighACEChoropleth_1.js"></script>
+        <script src="data/HighSchoolsExport_2.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        function pop_HighBoundariesExport_0(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>School</strong><br />' + (feature.properties['School'] !== null ? autolinker.link(feature.properties['School'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Students of Color (%)</th>\
+                        <td>' + (feature.properties['Students of Color (%)'] !== null ? autolinker.link(feature.properties['Students of Color (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Low-Income Students (%)</th>\
+                        <td>' + (feature.properties['Low-Income Students (%)'] !== null ? autolinker.link(feature.properties['Low-Income Students (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Students with Disabilities (%)</th>\
+                        <td>' + (feature.properties['Students with Disabilities (%)'] !== null ? autolinker.link(feature.properties['Students with Disabilities (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_HighBoundariesExport_0_0() {
+            return {
+                pane: 'pane_HighBoundariesExport_0',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,252,244,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_HighBoundariesExport_0');
+        map.getPane('pane_HighBoundariesExport_0').style.zIndex = 400;
+        map.getPane('pane_HighBoundariesExport_0').style['mix-blend-mode'] = 'normal';
+        var layer_HighBoundariesExport_0 = new L.geoJson(json_HighBoundariesExport_0, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_HighBoundariesExport_0',
+            layerName: 'layer_HighBoundariesExport_0',
+            pane: 'pane_HighBoundariesExport_0',
+            onEachFeature: pop_HighBoundariesExport_0,
+            style: style_HighBoundariesExport_0_0,
+        });
+        bounds_group.addLayer(layer_HighBoundariesExport_0);
+        map.addLayer(layer_HighBoundariesExport_0);
+        function pop_HighACEChoropleth_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['School'] !== null ? autolinker.link(feature.properties['School'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Students of Color (%)'] !== null ? autolinker.link(feature.properties['Students of Color (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Low-Income Students (%)'] !== null ? autolinker.link(feature.properties['Low-Income Students (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Students with Disabilities (%)'] !== null ? autolinker.link(feature.properties['Students with Disabilities (%)'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Mean ACE Score'] !== null ? autolinker.link(feature.properties['Mean ACE Score'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Instance Count'] !== null ? autolinker.link(feature.properties['Instance Count'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_HighACEChoropleth_1_0(feature) {
+            if (feature.properties['Mean ACE Score'] >= 0.232600 && feature.properties['Mean ACE Score'] <= 0.262000 ) {
+                return {
+                pane: 'pane_HighACEChoropleth_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(224,240,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Mean ACE Score'] >= 0.262000 && feature.properties['Mean ACE Score'] <= 0.305764 ) {
+                return {
+                pane: 'pane_HighACEChoropleth_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(170,208,231,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Mean ACE Score'] >= 0.305764 && feature.properties['Mean ACE Score'] <= 0.372500 ) {
+                return {
+                pane: 'pane_HighACEChoropleth_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(62,142,196,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Mean ACE Score'] >= 0.372500 && feature.properties['Mean ACE Score'] <= 0.424300 ) {
+                return {
+                pane: 'pane_HighACEChoropleth_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(8,48,107,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_HighACEChoropleth_1');
+        map.getPane('pane_HighACEChoropleth_1').style.zIndex = 401;
+        map.getPane('pane_HighACEChoropleth_1').style['mix-blend-mode'] = 'normal';
+        var layer_HighACEChoropleth_1 = new L.geoJson(json_HighACEChoropleth_1, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_HighACEChoropleth_1',
+            layerName: 'layer_HighACEChoropleth_1',
+            pane: 'pane_HighACEChoropleth_1',
+            onEachFeature: pop_HighACEChoropleth_1,
+            style: style_HighACEChoropleth_1_0,
+        });
+        bounds_group.addLayer(layer_HighACEChoropleth_1);
+        map.addLayer(layer_HighACEChoropleth_1);
+        function pop_HighSchoolsExport_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['altitudeMode'] !== null ? autolinker.link(feature.properties['altitudeMode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tessellate'] !== null ? autolinker.link(feature.properties['tessellate'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['extrude'] !== null ? autolinker.link(feature.properties['extrude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['visibility'] !== null ? autolinker.link(feature.properties['visibility'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['drawOrder'] !== null ? autolinker.link(feature.properties['drawOrder'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['icon'] !== null ? autolinker.link(feature.properties['icon'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_HighSchoolsExport_2_0() {
+            return {
+                pane: 'pane_HighSchoolsExport_2',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/education_university.svg',
+            iconSize: [25.08, 25.08]
+        }),
+                interactive: false,
+            }
+        }
+        map.createPane('pane_HighSchoolsExport_2');
+        map.getPane('pane_HighSchoolsExport_2').style.zIndex = 402;
+        map.getPane('pane_HighSchoolsExport_2').style['mix-blend-mode'] = 'normal';
+        var layer_HighSchoolsExport_2 = new L.geoJson(json_HighSchoolsExport_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_HighSchoolsExport_2',
+            layerName: 'layer_HighSchoolsExport_2',
+            pane: 'pane_HighSchoolsExport_2',
+            onEachFeature: pop_HighSchoolsExport_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_HighSchoolsExport_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_HighSchoolsExport_2);
+        map.addLayer(layer_HighSchoolsExport_2);
+        setBounds();
+
+                // Specify the latitude and longitude of the target point
+                var targetLatLngs = [
+                L.latLng(28.18150501076195, -82.77463070953876),
+                L.latLng(28.18950585333648, -82.32678165771168),
+                L.latLng(28.19289625534254, -82.66772236699664),
+                L.latLng(28.20094089257314, -82.50833154506688),
+                L.latLng(28.23447812870379, -82.71714876165031),
+                L.latLng(28.24994978975305, -82.18237566154112),
+                L.latLng(28.25630333248701, -82.31200470145394),
+                L.latLng(28.26164759316952, -82.48120675653341),
+                L.latLng(28.2674202838116, -82.62306502058343),
+                L.latLng(28.27125557058972, -82.68765639219836),
+                L.latLng(28.28064967670124, -82.3386242903494),
+                L.latLng(28.28725370780089, -82.53679329603267),
+                L.latLng(28.29010147785333, -82.27296440423092),
+                L.latLng(28.33315416007732, -82.6603720196612),
+                L.latLng(28.35173782246999, -82.20463894967418),
+                L.latLng(28.36729116535421, -82.64372245674686),
+                L.latLng(28.265687,-82.673687),
+            L.latLng(28.348562,-82.213437),
+            L.latLng(28.186813,-82.624188),
+            L.latLng(28.244563,-82.352063)
+                ]
+        
+            var pcsoLatLngs = [L.latLng(28.265687,-82.673687),
+            L.latLng(28.348562,-82.213437),
+            L.latLng(28.186813,-82.624188),
+            L.latLng(28.244563,-82.352063)
+            ]
+        
+                // Function to add a custom marker at the targetLatLng
+                function addCustomMarkerAtTarget() {
+                    var customIcon = L.divIcon({
+                        className: 'custom-icon',
+                        iconSize: [15, 15], // Adjust the size of the icon if needed
+                        html: '<div style="background-color: #ff0000; border-radius: 50%; width: 100%; height: 100%;"></div>',
+            });
+        
+            for (var i = 0; i < pcsoLatLngs.length; i++) {
+                var pcsoLatLng = pcsoLatLngs[i];
+                var marker = L.marker(pcsoLatLng, { icon: customIcon }).addTo(map);
+            }
+                }
+        
+                // Add the custom marker at the targetLatLng
+                addCustomMarkerAtTarget();
+        
+                // Function to calculate distance between two lat/lng points using the Haversine formula
+                function getDistanceInMiles(latlng1, latlng2) {
+                    const R = 3958.8; // Earth's radius in miles
+                    const lat1 = latlng1.lat;
+                    const lon1 = latlng1.lng;
+                    const lat2 = latlng2.lat;
+                    const lon2 = latlng2.lng;
+                
+                    const dLat = toRad(lat2 - lat1);
+                    const dLon = toRad(lon2 - lon1);
+                    const a =
+                        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    const distance = R * c;
+                
+                    return distance.toFixed(2);
+                 }
+                
+                // Function to convert degrees to radians
+                function toRad(deg) {
+                    return (deg * Math.PI) / 180;
+                }
+                  
+                    // Function to update the tooltip with distance information
+                    function updateTooltip(e) {
+                        var mouseLatLng = e.latlng;
+                        var closestDistance = Infinity;
+                        var tooltipContent = "";
+        
+                        // Iterate through each targetLatLng to find the nearest one
+                        for (var i = 0; i < targetLatLngs.length; i++) {
+                            var targetLatLng = targetLatLngs[i];
+                            var distance = getDistanceInMiles(mouseLatLng, targetLatLng);
+        
+                            // Update closestDistance and tooltipContent if this targetLatLng is closer
+                            if (distance < closestDistance) {
+                                closestDistance = distance;
+                                tooltipContent = distance + " Miles From Nearest ILP-informed Officer";
+                            }
+                        }
+                        var tooltip = document.getElementById("tooltip");
+                        tooltip.innerHTML = tooltipContent;
+                        tooltip.style.left = e.originalEvent.clientX + 10 + "px";
+                        tooltip.style.top = e.originalEvent.clientY - 25 + "px";
+                        tooltip.style.display = "block";
+                    }
+                  
+                // Function to hide the tooltip when the mouse leaves the map
+                 function hideTooltip() {
+                    var tooltip = document.getElementById("tooltip");
+                    tooltip.style.display = "none";
+                }
+                
+                // Add event listeners to update the tooltip
+                 map.on("mousemove", updateTooltip);
+                map.on("mouseout", hideTooltip);
+        </script>
+    </body>
+</html>
